@@ -1,20 +1,115 @@
+
 const projectorList = document.getElementById("projectorList");
 const projectorForm = document.getElementById("projectorForm");
 const formMessage = document.getElementById("formMessage");
 
+const loginPanel = document.getElementById("loginPanel");
+const dashboard = document.getElementById("dashboard");
+const loginForm = document.getElementById("loginForm");
+const loginPassword = document.getElementById("loginPassword");
+const loginMessage = document.getElementById("loginMessage");
+const logoutBtn = document.getElementById("logoutBtn");
+
+let csrfToken = "";
+
 async function apiRequest(url, method = "GET", data = undefined) {
-    const options = { method, headers: {} };
+    const options = {
+        method,
+        credentials: "same-origin",
+        headers: {}
+    };
+
+    if (method !== "GET") {
+        options.headers["X-CSRF-Token"] = csrfToken;
+    }
+
     if (data !== undefined) {
         options.headers["Content-Type"] = "application/json";
         options.body = JSON.stringify(data);
     }
+
     const response = await fetch(url, options);
-    const result = await response.json();
+
+    let result;
+    try {
+        result = await response.json();
+    } catch {
+        throw new Error("The server returned an invalid response.");
+    }
+
+    if (response.status === 401 && url !== "/api/login") {
+        showLogin("Your session has ended. Please log in again.");
+        throw new Error("Please log in again.");
+    }
+
     if (!response.ok || result.success === false) {
         throw new Error(result.message || `Request failed (${response.status})`);
     }
+
     return result;
 }
+
+function showLogin(message = "") {
+    dashboard.hidden = true;
+    loginPanel.hidden = false;
+    logoutBtn.hidden = true;
+    loginPassword.value = "";
+    loginMessage.textContent = message;
+    loginPassword.focus();
+}
+
+function showDashboard() {
+    loginPanel.hidden = true;
+    dashboard.hidden = false;
+    logoutBtn.hidden = false;
+    loginMessage.textContent = "";
+}
+
+async function checkAuthentication() {
+    try {
+        const response = await fetch("/api/auth/status", {
+            credentials: "same-origin"
+        });
+
+        const result = await response.json();
+        csrfToken = result.csrf_token || "";
+
+        if (result.authenticated) {
+            showDashboard();
+            await loadProjectors();
+        } else {
+            showLogin();
+        }
+    } catch {
+        showLogin("Unable to contact the server. Refresh the page.");
+    }
+}
+
+loginForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    loginMessage.textContent = "Checking password…";
+
+    try {
+        const result = await apiRequest("/api/login", "POST", {
+            password: loginPassword.value
+        });
+
+        csrfToken = result.csrf_token;
+        showDashboard();
+        await loadProjectors();
+    } catch (error) {
+        loginMessage.textContent = error.message;
+    }
+});
+
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await apiRequest("/api/logout", "POST", {});
+        showLogin("You have been logged out.");
+    } catch (error) {
+        showMessage(formMessage, error.message, "error");
+    }
+});
 
 function makeButton(text, className, handler) {
     const button = document.createElement("button");
@@ -53,9 +148,11 @@ async function loadProjectors() {
             const headingWrap = document.createElement("div");
             const heading = document.createElement("h3");
             heading.textContent = device.name;
+
             const meta = document.createElement("div");
             meta.className = "device-meta";
             meta.textContent = `${device.brand} ${device.model} · ${device.ip} · ${device.protocol}`;
+
             headingWrap.append(heading, meta);
 
             const badge = document.createElement("span");
@@ -63,6 +160,7 @@ async function loadProjectors() {
             if (device.connection === "CONNECTED") badge.classList.add("connected");
             if (device.connection === "FAILED") badge.classList.add("failed");
             badge.textContent = device.connection;
+
             top.append(headingWrap, badge);
 
             const status = document.createElement("p");
@@ -72,6 +170,7 @@ async function loadProjectors() {
 
             const actions = document.createElement("div");
             actions.className = "device-actions";
+
             actions.append(
                 makeButton("TEST CONNECTION", "connect-btn", () => connectDevice(device.id)),
                 makeButton("POWER ON", "on-btn", () => sendPower(device.id, "ON")),
@@ -83,7 +182,9 @@ async function loadProjectors() {
             projectorList.appendChild(card);
         });
     } catch (error) {
-        projectorList.textContent = `Unable to load devices: ${error.message}`;
+        if (!error.message.includes("log in")) {
+            projectorList.textContent = `Unable to load devices: ${error.message}`;
+        }
     }
 }
 
@@ -121,11 +222,12 @@ async function connectDevice(id) {
 }
 
 async function sendPower(id, action) {
-    const confirmed = confirm(`Send REAL POWER ${action} command to this projector?`);
-    if (!confirmed) return;
+    if (!confirm(`Send REAL POWER ${action} command to this projector?`)) return;
 
     try {
-        const result = await apiRequest(`/api/projectors/${id}/power`, "POST", { action });
+        const result = await apiRequest(
+            `/api/projectors/${id}/power`, "POST", { action }
+        );
         showMessage(formMessage, result.message, "success");
         await loadProjectors();
     } catch (error) {
@@ -136,6 +238,7 @@ async function sendPower(id, action) {
 
 async function deleteDevice(id) {
     if (!confirm("Delete this projector profile and clear its in-memory credentials?")) return;
+
     try {
         const result = await apiRequest(`/api/projectors/${id}`, "DELETE");
         showMessage(formMessage, result.message, "success");
@@ -146,4 +249,5 @@ async function deleteDevice(id) {
 }
 
 document.getElementById("refreshBtn").addEventListener("click", loadProjectors);
-loadProjectors();
+
+checkAuthentication();
