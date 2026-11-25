@@ -1,0 +1,91 @@
+* { box-sizing: border-box; }
+:root {
+    color-scheme: dark;
+    --bg: #080d18;
+    --panel: #121d30;
+    --panel-2: #0c1627;
+    --line: #263650;
+    --text: #f4f7fb;
+    --muted: #9aa9bd;
+    --blue: #3979f6;
+    --green: #22a06b;
+    --red: #d64c5b;
+    --amber: #f0bd58;
+}
+body {
+    margin: 0; padding: 28px 16px 40px; min-height: 100vh;
+    background: radial-gradient(ellipse at top, #14213a 0, var(--bg) 55%);
+    color: var(--text); font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+.container { width: min(920px, 100%); margin: 0 auto; }
+.header, .section-heading, .device-top, .device-actions {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.header { margin-bottom: 24px; }
+h1 { margin: 5px 0 8px; font-size: clamp(25px, 5vw, 36px); letter-spacing: -.7px; }
+h2 { margin: 4px 0 0; font-size: 21px; }
+.subtitle, .eyebrow, small, footer { color: var(--muted); }
+.subtitle { margin: 0; }
+.eyebrow { margin: 0; font-size: 10px; font-weight: 800; letter-spacing: 1.7px; }
+.mode-pill, .protocol-tag, .state-pill {
+    display: inline-flex; align-items: center; border-radius: 999px;
+    padding: 8px 12px; font-size: 11px; font-weight: 800; white-space: nowrap;
+}
+.mode-pill { background: #123d31; color: #8ce2bd; border: 1px solid #24634d; }
+.protocol-tag { background: #1b2b45; color: #b8c9e3; }
+.notice {
+    padding: 15px 17px; margin: 0 0 22px; border-radius: 12px;
+    background: #352a17; border: 1px solid #66502b; color: #f4dcae;
+    line-height: 1.6; font-size: 13px;
+}
+.panel, .device-card {
+    background: linear-gradient(145deg, var(--panel), #101a2b);
+    border: 1px solid var(--line); border-radius: 17px; padding: 23px;
+}
+.panel { margin-bottom: 30px; }
+.section-heading { margin-bottom: 21px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 17px; }
+label { display: flex; flex-direction: column; gap: 8px; color: #d8e1ed; font-size: 13px; font-weight: 650; }
+input, select {
+    width: 100%; min-width: 0; padding: 13px 14px; border-radius: 9px;
+    border: 1px solid #354761; background: var(--panel-2); color: var(--text);
+    font-size: 14px; outline: none;
+}
+input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px #3979f622; }
+small { font-size: 11px; line-height: 1.45; font-weight: 400; }
+.full-width { grid-column: 1 / -1; }
+button { border: 0; border-radius: 9px; padding: 12px 16px; font-size: 12px; font-weight: 800; cursor: pointer; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.primary-btn { margin-top: 20px; width: 100%; background: var(--blue); color: white; }
+.secondary-btn { background: #263852; color: #e6eef9; }
+.message { min-height: 18px; margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+.message.error, .error-text { color: #ff9ca5; }
+.message.success { color: #8ce2bd; }
+.devices-section { margin-top: 28px; }
+.device-list { display: grid; gap: 14px; }
+.device-card { padding: 19px; }
+.device-top { align-items: flex-start; }
+.device-top h3 { margin: 0 0 6px; font-size: 18px; }
+.device-meta { color: var(--muted); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.state-pill { background: #283247; color: #d6e0ef; }
+.state-pill.connected { background: #123d31; color: #8ce2bd; }
+.state-pill.failed { background: #49232b; color: #ffadb5; }
+.device-status { margin: 15px 0 0; padding: 12px; background: #0b1525; border-radius: 9px; font-size: 13px; }
+.device-status strong { color: white; }
+.device-actions { justify-content: flex-start; flex-wrap: wrap; margin-top: 14px; }
+.connect-btn { background: #275a9f; color: white; }
+.on-btn { background: #147b51; color: white; }
+.off-btn { background: #a73543; color: white; }
+.delete-btn { background: #2c394d; color: #d7e0ec; margin-left: auto; }
+.empty-state { padding: 28px; text-align: center; border: 1px dashed #354761; border-radius: 12px; color: var(--muted); }
+footer { text-align: center; margin-top: 32px; font-size: 11px; line-height: 1.6; }
+@media (max-width: 600px) {
+    body { padding: 20px 12px 30px; }
+    .header { align-items: flex-start; flex-direction: column; }
+    .section-heading { align-items: flex-start; flex-direction: column; }
+    .form-grid { grid-template-columns: 1fr; }
+    .full-width { grid-column: auto; }
+    .panel { padding: 17px; }
+    .device-actions button { flex: 1 1 40%; }
+    .delete-btn { margin-left: 0; }
+}

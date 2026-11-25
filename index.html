@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Projector Remote</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<main class="container">
+    <header class="header">
+        <div>
+            <p class="eyebrow">DEVICE MANAGEMENT</p>
+            <h1>Universal Projector Remote</h1>
+            <p class="subtitle">Real PJLink control for compatible, authorized projectors</p>
+        </div>
+        <span class="mode-pill">REAL CONTROL</span>
+    </header>
+
+    <section class="notice">
+        <strong>Important:</strong> This app sends real PJLink commands to the IP address you enter.
+        Use it only with projectors and networks you are authorized to control. It does not simulate
+        power status. A successful status is shown only after the projector responds.
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">NEW DEVICE</p>
+                <h2>Add a projector</h2>
+            </div>
+            <span class="protocol-tag">PJLink Class 1 · TCP 4352</span>
+        </div>
+
+        <form id="projectorForm">
+            <div class="form-grid">
+                <label>Projector name
+                    <input id="name" placeholder="Classroom 101" required maxlength="60">
+                </label>
+                <label>Brand
+                    <select id="brand" required>
+                        <option value="Epson">Epson</option>
+                        <option value="BenQ">BenQ</option>
+                        <option value="Sony">Sony</option>
+                        <option value="Panasonic">Panasonic</option>
+                        <option value="Optoma">Optoma</option>
+                        <option value="ViewSonic">ViewSonic</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </label>
+                <label>Exact model
+                    <input id="model" placeholder="Enter model number" required maxlength="80">
+                </label>
+                <label>Projector IP address
+                    <input id="ip" placeholder="Example: 192.168.1.100" required inputmode="decimal">
+                </label>
+                <label class="full-width">PJLink password
+                    <input id="password" type="password" placeholder="Leave blank only if PJLink authentication is disabled" autocomplete="new-password">
+                    <small>Password is held in server memory only and is not returned to the browser API.</small>
+                </label>
+            </div>
+            <button class="primary-btn" type="submit">ADD PROJECTOR</button>
+        </form>
+        <p id="formMessage" class="message" role="status"></p>
+    </section>
+
+    <section class="devices-section">
+        <div class="section-heading">
+            <div>
+                <p class="eyebrow">YOUR DEVICES</p>
+                <h2>Projector dashboard</h2>
+            </div>
+            <button id="refreshBtn" class="secondary-btn" type="button">Refresh</button>
+        </div>
+        <div id="projectorList" class="device-list">
+            <div class="empty-state">Loading projector profiles…</div>
+        </div>
+    </section>
+
+    <footer>
+        PJLink support varies by model and configuration. The projector's network-control feature must be enabled
+        and the laptop must have authorized network access.
+    </footer>
+</main>
+<script src="/script.js"></script>
+</body>
+</html>
